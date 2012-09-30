@@ -33,26 +33,13 @@ namespace OpenTKCameraPort
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
             GL.LoadMatrix(ref cameraMatrix);
 
-            // Display some planes
-            for (int x = -10; x <= 10; x++)
-            {
-                for (int z = -10; z <= 10; z++)
-                {
-                    GL.PushMatrix();
-                    GL.Translate((float)x * 5f, 0f, (float)z * 5f);
-                    GL.Begin(BeginMode.Quads);
-                    GL.Color3(Color.Red);
-                    GL.Vertex3(1f, 4f, 0f);
-                    GL.Color3(Color.Orange);
-                    GL.Vertex3(-1f, 4f, 0f);
-                    GL.Color3(Color.Brown);
-                    GL.Vertex3(-1f, 0f, 0f);
-                    GL.Color3(Color.Maroon);
-                    GL.Vertex3(1f, 0f, 0f);
-                    GL.End();
-                    GL.PopMatrix();
-                }
-            }
+            GL.Begin(BeginMode.TriangleFan);
+            GL.Color3(Color.Red); GL.Vertex3(0f, 10f, 0f);
+            GL.Color3(Color.Green); GL.Vertex3(-10f, -10f, 0f);
+            GL.Color3(Color.Blue); GL.Vertex3(10f, -10f, 0f);
+            GL.Color3(Color.White); GL.Vertex3(10f, -10f, 10f);
+            GL.Color3(Color.Gold); GL.Vertex3(-10f, -10f, 10f);
+            GL.End();
 
             SwapBuffers();
         }
