@@ -1,41 +1,95 @@
-﻿// Released to the public domain. Use, modify and relicense at will.
+﻿
 
 using System;
-
+using System.Drawing;
 using OpenTK;
-using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
-using OpenTK.Audio;
-using OpenTK.Audio.OpenAL;
 using OpenTK.Input;
 
-namespace StarterKit
+//sources http://www.opentk.com/node/1492?page=1s
+namespace OpenTKCameraPort
 {
-    class Game : GameWindow
+    class Program : GameWindow
     {
-        /// <summary>Creates a 800x600 window with the specified title.</summary>
-        public Game()
-            : base(800, 600, GraphicsMode.Default, "OpenTK Quick Start Sample")
-        {
-            VSync = VSyncMode.On;
-        }
+        private Matrix4 cameraMatrix;
 
-        /// <summary>Load resources here.</summary>
-        /// <param name="e">Not used.</param>
-        protected override void OnLoad(EventArgs e)
+        public Program()
+            : base(1024, 768)
         {
-            base.OnLoad(e);
-
-            GL.ClearColor(0.1f, 0.2f, 0.5f, 0.0f);
             GL.Enable(EnableCap.DepthTest);
         }
 
-        /// <summary>
-        /// Called when your window is resized. Set your viewport here. It is also
-        /// a good place to set up your projection matrix (which probably changes
-        /// along when the aspect ratio of your window).
-        /// </summary>
-        /// <param name="e">Not used.</param>
+        protected override void OnLoad(EventArgs e)
+        {
+            base.OnLoad(e);
+            cameraMatrix = Matrix4.CreateTranslation(0f, -10f, 0f);
+        }
+
+        protected override void OnRenderFrame(FrameEventArgs e)
+        {
+            base.OnRenderFrame(e);
+
+            GL.MatrixMode(MatrixMode.Modelview);
+            GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
+            GL.LoadMatrix(ref cameraMatrix);
+
+            // Display some planes
+            for (int x = -10; x <= 10; x++)
+            {
+                for (int z = -10; z <= 10; z++)
+                {
+                    GL.PushMatrix();
+                    GL.Translate((float)x * 5f, 0f, (float)z * 5f);
+                    GL.Begin(BeginMode.Quads);
+                    GL.Color3(Color.Red);
+                    GL.Vertex3(1f, 4f, 0f);
+                    GL.Color3(Color.Orange);
+                    GL.Vertex3(-1f, 4f, 0f);
+                    GL.Color3(Color.Brown);
+                    GL.Vertex3(-1f, 0f, 0f);
+                    GL.Color3(Color.Maroon);
+                    GL.Vertex3(1f, 0f, 0f);
+                    GL.End();
+                    GL.PopMatrix();
+                }
+            }
+
+            SwapBuffers();
+        }
+
+        protected override void OnUpdateFrame(FrameEventArgs e)
+        {
+            float forwardZ = 0f, sideX = 0f;
+            if (Keyboard[Key.W])
+            {
+                forwardZ = 10f* (float)e.Time;
+            }
+            else if (Keyboard[Key.S])
+            {
+                forwardZ = -10f * (float)e.Time;
+            }
+
+            if (Keyboard[Key.A])
+            {
+                sideX = 10f * (float)e.Time;
+            }
+
+            else if (Keyboard[Key.D])
+            {
+                sideX = -10f * (float)e.Time;
+            }
+            cameraMatrix *= Matrix4.CreateTranslation(sideX, 0f, forwardZ);
+
+            float mouseX = Mouse.XDelta/150f;
+            float mouseY = Mouse.YDelta/150f;
+
+            cameraMatrix *= Matrix4.CreateRotationX(mouseY);
+            cameraMatrix *= Matrix4.CreateRotationY(mouseX);
+
+            if (Keyboard[Key.Escape])
+                Exit();
+        }
+
         protected override void OnResize(EventArgs e)
         {
             base.OnResize(e);
@@ -47,55 +101,15 @@ namespace StarterKit
             GL.LoadMatrix(ref projection);
         }
 
-        /// <summary>
-        /// Called when it is time to setup the next frame. Add you game logic here.
-        /// </summary>
-        /// <param name="e">Contains timing information for framerate independent logic.</param>
-        protected override void OnUpdateFrame(FrameEventArgs e)
+
+
+        public static void Main(string[] args)
         {
-            base.OnUpdateFrame(e);
 
-            if (Keyboard[Key.Escape])
-                Exit();
-        }
 
-        /// <summary>
-        /// Called when it is time to render the next frame. Add your rendering code here.
-        /// </summary>
-        /// <param name="e">Contains timing information.</param>
-        protected override void OnRenderFrame(FrameEventArgs e)
-        {
-            base.OnRenderFrame(e);
-
-            GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
-
-            Matrix4 modelview = Matrix4.LookAt(Vector3.Zero, Vector3.UnitZ, Vector3.UnitY);
-            GL.MatrixMode(MatrixMode.Modelview);
-            GL.LoadMatrix(ref modelview);
-
-            GL.Begin(BeginMode.Triangles);
-
-            GL.Color3(1.0f, 1.0f, 0.0f); GL.Vertex3(-1.0f, -1.0f, 4.0f);
-            GL.Color3(1.0f, 0.0f, 0.0f); GL.Vertex3(1.0f, -1.0f, 4.0f);
-            GL.Color3(0.2f, 0.9f, 1.0f); GL.Vertex3(0.0f, 1.0f, 4.0f);
-
-            GL.End();
-
-            SwapBuffers();
-        }
-
-        /// <summary>
-        /// The main entry point for the application.
-        /// </summary>
-        [STAThread]
-        static void Main()
-        {
-            // The 'using' idiom guarantees proper resource cleanup.
-            // We request 30 UpdateFrame events per second, and unlimited
-            // RenderFrame events (as fast as the computer can handle).
-            using (Game game = new Game())
+            using (Program p = new Program())
             {
-                game.Run(30.0);
+                p.Run();
             }
         }
     }
