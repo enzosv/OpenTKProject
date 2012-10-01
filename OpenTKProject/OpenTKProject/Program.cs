@@ -8,18 +8,17 @@ using OpenTK.Input;
 using System.Windows.Forms;
 
 //sources http://www.opentk.com/node/1492?page=1s
+//http://code.google.com/p/speedprogramming/
 namespace CS177Project
 {
     class Game : GameWindow
     {
         private Matrix4 cameraMatrix;
         private float mouseX, mouseY;
-        private float sceenWidth = 1024, sceenHeight = 768;
         public Game()
-            : base(1024, 768)
+            : base(Screen.PrimaryScreen.Bounds.Right, Screen.PrimaryScreen.Bounds.Bottom)
         {
             GL.Enable(EnableCap.DepthTest);
-            //glfwSetMousePos(x,y); 
             VSync = VSyncMode.On;
         }
 
@@ -28,13 +27,14 @@ namespace CS177Project
         protected override void OnLoad(EventArgs e)
         {
             base.OnLoad(e);
-            Cursor.Position = new Point(800, 450);
+
             mouseX = 0;
             mouseY = 0;
             GL.ClearColor(0f, 0f, 0f, 0f);
             GL.Enable(EnableCap.DepthTest);
-            cameraMatrix *= Matrix4.CreateRotationX(6);
+            //cameraMatrix *= Matrix4.CreateRotationX(6);
             cameraMatrix = Matrix4.CreateTranslation(0f, 0f, 40f);
+            Cursor.Position = new Point(Screen.PrimaryScreen.Bounds.Right / 2, Screen.PrimaryScreen.Bounds.Bottom / 2);
         }
 
         /// <summary>
@@ -48,15 +48,31 @@ namespace CS177Project
             GL.MatrixMode(MatrixMode.Modelview);
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
             GL.LoadMatrix(ref cameraMatrix);
+            for (int x = -10; x <= 10; x++)
+            {
 
-            GL.Begin(BeginMode.TriangleFan);
-            GL.Color3(Color.Red); GL.Vertex3(0f, 10f, -5f);
-            GL.Color3(Color.Orange); GL.Vertex3(-10f, -10f, 0f);
-            GL.Color3(Color.Yellow); GL.Vertex3(10f, -10f, 0f);
-            GL.Color3(Color.Green); GL.Vertex3(10f, -10f, -10f);
-            GL.Color3(Color.Blue); GL.Vertex3(-10f, -10f, -10f);
-            GL.Color3(Color.Indigo); GL.Vertex3(-10f, -10f, 0f);
-            GL.End();
+                //int rn = 1;
+                for (int z = -10; z <= 10; z++)
+                {
+                    if (z == 0)
+                    {
+                        z = 1;
+                    }
+                    GL.PushMatrix();
+                    GL.Translate((float)x * 5f, 0f, (float)z * 5f);
+                    GL.Begin(BeginMode.TriangleFan);
+                    GL.Color3(Color.Red); GL.Vertex3(0f, 1f,(10/z)-1); //0
+                    GL.Color3(Color.Orange); GL.Vertex3(-1f, -1f, 1f);
+                    GL.Color3(Color.Yellow); GL.Vertex3(1f, -1f, 1f);
+                    GL.Color3(Color.Green); GL.Vertex3(1f, -1f, -1f);
+                    GL.Color3(Color.Blue); GL.Vertex3(-1f, -1f, -1f);
+                    GL.Color3(Color.Indigo); GL.Vertex3(-1f, -1f, 1f);
+
+                    GL.End();
+                    GL.PopMatrix();
+                }
+            }
+
 
             SwapBuffers();
         }
@@ -67,10 +83,11 @@ namespace CS177Project
         /// <param name="e">Contains timing information for framerate independent logic.</param>
         protected override void OnUpdateFrame(FrameEventArgs e)
         {
-            cameraMatrix *= Matrix4.CreateRotationX(mouseY);
-            cameraMatrix *= Matrix4.CreateRotationY(mouseX);
 
-            float time = 10f*(float)e.Time;
+            //cameraMatrix *= Matrix4.CreateRotationX(mouseY);
+
+
+            float time = 15f * (float)e.Time;
             float forwardZ = 0f, sideX = 0f;
             if (Keyboard[Key.W])
             {
@@ -92,15 +109,25 @@ namespace CS177Project
             }
             cameraMatrix *= Matrix4.CreateTranslation(sideX, 0f, forwardZ);
 
-            mouseX = Mouse.XDelta / 150f;
-            mouseY = Mouse.YDelta / 150f;
+            cameraMatrix *= Matrix4.CreateRotationY(mouseX);
+            mouseX = Mouse.XDelta / 100f;
+            //mouseY = Mouse.YDelta / 150f;
+            if (Cursor.Position.X >= Screen.PrimaryScreen.Bounds.Right - 1)
+            {
+                Cursor.Position = new Point(Screen.PrimaryScreen.Bounds.Left, Cursor.Position.Y);
+            }
+            else if (Cursor.Position.X <= Screen.PrimaryScreen.Bounds.Left)
+            {
+                Cursor.Position = new Point(Screen.PrimaryScreen.Bounds.Right, Cursor.Position.Y);
+            }
             float mouseZ = Mouse.WheelPrecise;
 
-            
-            
+
+
             //cameraMatrix *= Matrix4.Scale(mouseZ);
-            
-            //cameraMatrix = Matrix4.LookAt(, new Vector3(Mouse.X, Mouse.Y, Mouse.WheelPrecise), new Vector3(0, 0, 0));
+
+            //cameraMatrix = Matrix4.LookAt(new Vector3(0,0,40), new Vector3(Cursor.Position.X, Cursor.Position.Y, 0), new Vector3(0, 0, 40));
+
 
             if (Keyboard[Key.Escape])
                 Exit();
