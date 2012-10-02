@@ -14,7 +14,7 @@ namespace CS177Project
     class Game : GameWindow
     {
         private Matrix4 cameraMatrix;
-        private float mouseX, mouseY;
+        private float mouseX;
         public Game()
             : base(Screen.PrimaryScreen.Bounds.Right, Screen.PrimaryScreen.Bounds.Bottom)
         {
@@ -29,11 +29,11 @@ namespace CS177Project
             base.OnLoad(e);
 
             mouseX = 0;
-            mouseY = 0;
             GL.ClearColor(0f, 0f, 0f, 0f);
             GL.Enable(EnableCap.DepthTest);
             //cameraMatrix *= Matrix4.CreateRotationX(6);
-            cameraMatrix = Matrix4.CreateTranslation(0f, 0f, 40f);
+            cameraMatrix = Matrix4.CreateTranslation(0f, 0f, 0f);
+            Cursor.Hide();
             Cursor.Position = new Point(Screen.PrimaryScreen.Bounds.Right / 2, Screen.PrimaryScreen.Bounds.Bottom / 2);
         }
 
@@ -48,20 +48,16 @@ namespace CS177Project
             GL.MatrixMode(MatrixMode.Modelview);
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
             GL.LoadMatrix(ref cameraMatrix);
-            for (int x = -10; x <= 10; x++)
+            for (int x = 0; x <= 20; x++)
             {
 
                 //int rn = 1;
-                for (int z = -10; z <= 10; z++)
+                for (int z = 0; z <= 20; z++)
                 {
-                    if (z == 0)
-                    {
-                        z = 1;
-                    }
                     GL.PushMatrix();
                     GL.Translate((float)x * 5f, 0f, (float)z * 5f);
                     GL.Begin(BeginMode.TriangleFan);
-                    GL.Color3(Color.Red); GL.Vertex3(0f, 1f,(10/z)-1); //0
+                    GL.Color3(Color.Red); GL.Vertex3(0f, 1f,0f); //0
                     GL.Color3(Color.Orange); GL.Vertex3(-1f, -1f, 1f);
                     GL.Color3(Color.Yellow); GL.Vertex3(1f, -1f, 1f);
                     GL.Color3(Color.Green); GL.Vertex3(1f, -1f, -1f);
@@ -83,29 +79,25 @@ namespace CS177Project
         /// <param name="e">Contains timing information for framerate independent logic.</param>
         protected override void OnUpdateFrame(FrameEventArgs e)
         {
-
-            //cameraMatrix *= Matrix4.CreateRotationX(mouseY);
-
-
-            float time = 15f * (float)e.Time;
+            float speed = 15f * (float)e.Time;
             float forwardZ = 0f, sideX = 0f;
             if (Keyboard[Key.W])
             {
-                forwardZ = time;
+                forwardZ = speed;
             }
             else if (Keyboard[Key.S])
             {
-                forwardZ = -time;
+                forwardZ = -speed;
             }
 
             if (Keyboard[Key.A])
             {
-                sideX = time;
+                sideX = speed;
             }
 
             else if (Keyboard[Key.D])
             {
-                sideX = -time;
+                sideX = -speed;
             }
             cameraMatrix *= Matrix4.CreateTranslation(sideX, 0f, forwardZ);
 
@@ -120,14 +112,6 @@ namespace CS177Project
             {
                 Cursor.Position = new Point(Screen.PrimaryScreen.Bounds.Right, Cursor.Position.Y);
             }
-            float mouseZ = Mouse.WheelPrecise;
-
-
-
-            //cameraMatrix *= Matrix4.Scale(mouseZ);
-
-            //cameraMatrix = Matrix4.LookAt(new Vector3(0,0,40), new Vector3(Cursor.Position.X, Cursor.Position.Y, 0), new Vector3(0, 0, 40));
-
 
             if (Keyboard[Key.Escape])
                 Exit();
