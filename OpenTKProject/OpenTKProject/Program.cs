@@ -9,16 +9,93 @@ using System.Windows.Forms;
 
 //sources http://www.opentk.com/node/1492?page=1s
 //http://code.google.com/p/speedprogramming/
+//http://www.opentk.com/node/2873 rotating cube
+//http://www.opentk.com/node/1800 sphere
 namespace CS177Project
 {
     class Game : GameWindow
     {
         private Matrix4 cameraMatrix;
-        private float mouseX;
+        private float mouseX, forwardZ, sideX, rotation;
+        #region Pyriamids
+        float[] pyramid = 
+        {
+            0f, 1f,0f,
+            -1f, -1f, 1f,
+            1f, -1f, 1f,
+            1f, -1f, -1f,
+            -1f, -1f, -1f,
+            -1f, -1f, 1f
+        };
+        byte[] pyramidTriangles =
+		{
+			1, 0, 2, // front
+			3, 2, 0,
+			6, 4, 5, // back
+			4, 6, 7,
+			4, 7, 0, // left
+			7, 3, 0,
+			1, 2, 5, //right
+			2, 6, 5,
+			0, 1, 5, // top
+			0, 5, 4,
+			2, 3, 6, // bottom
+			3, 7, 6,
+		};
+        float[] pyramidColors = 
+        {
+            1, 0, 0,
+            Color.Orange.R, Color.Orange.G, Color.Orange.B,
+            Color.Yellow.R, Color.Yellow.G, Color.Yellow.B,
+            0, 1, 1,
+            1, 0, 0,
+            Color.Indigo.R, Color.Indigo.G, Color.Indigo.B,
+        };
+        #endregion
+        #region Cube information
+
+        float[] cubeColors = {
+			1, 0, 0,
+            Color.Orange.R, Color.Orange.G, Color.Orange.B,
+            Color.Yellow.R, Color.Yellow.G, Color.Yellow.B,
+            0, 1, 1,
+            1, 0, 0,
+            Color.Indigo.R, Color.Indigo.G, Color.Indigo.B,
+            1, 0, 0,
+            Color.Orange.R, Color.Orange.G, Color.Orange.B,
+		};
+
+        byte[] cubeTriangles =
+		{
+			1, 0, 2, // front
+			3, 2, 0,
+			6, 4, 5, // back
+			4, 6, 7,
+			4, 7, 0, // left
+			7, 3, 0,
+			1, 2, 5, //right
+			2, 6, 5,
+			0, 1, 5, // top
+			0, 5, 4,
+			2, 3, 6, // bottom
+			3, 7, 6,
+		};
+
+        float[] cube = {
+			-0.5f,  1f,  0.5f, // vertex[0]
+			 0.5f,  1f,  0.5f, // vertex[1]
+			 0.5f, -1f,  0.5f, // vertex[2]
+			-0.5f, -1f,  0.5f, // vertex[3]
+			-0.5f,  1f, -0.5f, // vertex[4]
+			 0.5f,  1f, -0.5f, // vertex[5]
+			 0.5f, -1f, -0.5f, // vertex[6]
+			-0.5f, -1f, -0.5f, // vertex[7]
+		};
+
+        #endregion
         public Game()
             : base(Screen.PrimaryScreen.Bounds.Right, Screen.PrimaryScreen.Bounds.Bottom)
         {
-            GL.Enable(EnableCap.DepthTest);
             VSync = VSyncMode.On;
         }
 
@@ -31,10 +108,14 @@ namespace CS177Project
             mouseX = 0;
             GL.ClearColor(0f, 0f, 0f, 0f);
             GL.Enable(EnableCap.DepthTest);
-            //cameraMatrix *= Matrix4.CreateRotationX(6);
-            cameraMatrix = Matrix4.CreateTranslation(0f, 0f, 0f);
-            Cursor.Hide();
+            GL.Enable(EnableCap.CullFace);
+            GL.EnableClientState(EnableCap.VertexArray);
+            GL.EnableClientState(EnableCap.ColorArray);
+            //cameraMatrix = Matrix4.CreateTranslation(0f, 0f, 0f);
+            cameraMatrix = Matrix4.CreateRotationY(10);
+            //Cursor.Hide();
             Cursor.Position = new Point(Screen.PrimaryScreen.Bounds.Right / 2, Screen.PrimaryScreen.Bounds.Bottom / 2);
+
         }
 
         /// <summary>
@@ -48,21 +129,62 @@ namespace CS177Project
             GL.MatrixMode(MatrixMode.Modelview);
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
             GL.LoadMatrix(ref cameraMatrix);
+
             for (int x = 0; x <= 20; x++)
             {
-
-                //int rn = 1;
                 for (int z = 0; z <= 20; z++)
                 {
                     GL.PushMatrix();
                     GL.Translate((float)x * 5f, 0f, (float)z * 5f);
-                    GL.Begin(BeginMode.TriangleFan);
-                    GL.Color3(Color.Red); GL.Vertex3(0f, 1f,0f); //0
-                    GL.Color3(Color.Orange); GL.Vertex3(-1f, -1f, 1f);
-                    GL.Color3(Color.Yellow); GL.Vertex3(1f, -1f, 1f);
-                    GL.Color3(Color.Green); GL.Vertex3(1f, -1f, -1f);
-                    GL.Color3(Color.Blue); GL.Vertex3(-1f, -1f, -1f);
-                    GL.Color3(Color.Indigo); GL.Vertex3(-1f, -1f, 1f);
+                    rotation = (rotation < 360f) ? (rotation + (float)e.Time) : 0f;
+                    if (x % 2 == 0) //pyramids
+                    {
+                        //GL.Begin(BeginMode.TriangleFan);
+                       
+                        //GL.Color3(Color.Red);
+                        //GL.Vertex3(cameraMatrix.Column1.X, 1f, cameraMatrix.Column1.Z); //0
+                        //GL.Color3(Color.Orange);
+                        //GL.Vertex3(-1f, -1f, 1f);
+                        //GL.Color3(Color.Yellow);
+                        //GL.Vertex3(1f, -1f, 1f);
+                        //GL.Color3(Color.Green);
+                        //GL.Vertex3(1f, -1f, -1f);
+                        //GL.Color3(Color.Blue);
+                        //GL.Vertex3(-1f, -1f, -1f);
+                        //GL.Color3(Color.Indigo);
+                        //GL.Vertex3(-1f, -1f, 1f);
+                        GL.VertexPointer(3, VertexPointerType.Float, 0, pyramid);
+                        GL.ColorPointer(4, ColorPointerType.Float, 0, pyramidColors);
+                        GL.DrawElements(BeginMode.TriangleFan, 6, DrawElementsType.UnsignedByte, pyramid);
+
+                    }
+                    if (z % 3 == 0)  //cubes
+                    {
+                        GL.VertexPointer(3, VertexPointerType.Float, 0, cube);
+                        GL.ColorPointer(4, ColorPointerType.Float, 0, cubeColors);
+                        GL.DrawElements(BeginMode.Triangles, 36, DrawElementsType.UnsignedByte, cubeTriangles);
+                    }
+                    else //spheres
+                    {
+                        GL.Begin(BeginMode.TriangleFan);
+                        //GL.ColorPointer(3, ColorPointerType.Float, 0, pyramidColors);
+                        GL.Color3(Color.Blue);
+                        GL.Vertex3(cameraMatrix.Column1.X, 1f, cameraMatrix.Column1.Z); //0
+                        //GL.Color3(Color.Orange);
+                        GL.Vertex3(-1f, -1f, 1f);
+                        // GL.Color3(Color.Yellow);
+                        GL.Vertex3(1f, -1f, 1f);
+                        //GL.Color3(Color.Green);
+                        GL.Vertex3(1f, -1f, -1f);
+                        //GL.Color3(Color.Blue);
+                        GL.Vertex3(-1f, -1f, -1f);
+                        //GL.Color3(Color.Indigo);
+                        GL.Vertex3(-1f, -1f, 1f);
+                    }
+
+                    //GL.VertexPointer(3, VertexPointerType.Float, 0, pyramidShape);
+
+                    //GL.DrawElements(BeginMode.TriangleFan, 36, DrawElementsType.UnsignedByte, triangles);
 
                     GL.End();
                     GL.PopMatrix();
@@ -80,7 +202,8 @@ namespace CS177Project
         protected override void OnUpdateFrame(FrameEventArgs e)
         {
             float speed = 15f * (float)e.Time;
-            float forwardZ = 0f, sideX = 0f;
+            forwardZ = 0f;
+            sideX = 0f;
             if (Keyboard[Key.W])
             {
                 forwardZ = speed;
@@ -102,15 +225,15 @@ namespace CS177Project
             cameraMatrix *= Matrix4.CreateTranslation(sideX, 0f, forwardZ);
 
             cameraMatrix *= Matrix4.CreateRotationY(mouseX);
-            mouseX = Mouse.XDelta / 100f;
+            mouseX = Mouse.XDelta / 150f;
             //mouseY = Mouse.YDelta / 150f;
             if (Cursor.Position.X >= Screen.PrimaryScreen.Bounds.Right - 1)
             {
-                Cursor.Position = new Point(Screen.PrimaryScreen.Bounds.Left, Cursor.Position.Y);
+                Cursor.Position = new Point(Screen.PrimaryScreen.Bounds.Right - 1, Cursor.Position.Y);
             }
             else if (Cursor.Position.X <= Screen.PrimaryScreen.Bounds.Left)
             {
-                Cursor.Position = new Point(Screen.PrimaryScreen.Bounds.Right, Cursor.Position.Y);
+                Cursor.Position = new Point(Screen.PrimaryScreen.Bounds.Left, Cursor.Position.Y);
             }
 
             if (Keyboard[Key.Escape])
@@ -148,6 +271,7 @@ namespace CS177Project
             {
                 game.Run(30.0);
             }
+
         }
 
     }
