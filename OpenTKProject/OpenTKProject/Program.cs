@@ -241,7 +241,7 @@ namespace CS177Project
                 Exit();
             
             rotation -= crement;
-            if (rotation <= -1f || rotation >=1f)
+            if (rotation <= -1f || rotation >=0.99f)
             {
                 crement *= -1;
             }
