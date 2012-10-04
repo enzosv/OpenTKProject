@@ -16,7 +16,7 @@ namespace CS177Project
     class Game : GameWindow
     {
         private Matrix4 cameraMatrix;
-        private float mouseX, forwardZ, sideX, rotation;
+        private float mouseX, forwardZ, sideX, rotation = 1f, crement = 0.03f;
         #region Pyriamids
         float[] pyramid = 
         {
@@ -129,33 +129,34 @@ namespace CS177Project
             GL.MatrixMode(MatrixMode.Modelview);
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
             GL.LoadMatrix(ref cameraMatrix);
-
+            //rotation = (rotation > 0f) ? (rotation - 1 / 30) : 1f;
+           
             for (int x = 0; x <= 20; x++)
             {
                 for (int z = 0; z <= 20; z++)
                 {
                     GL.PushMatrix();
                     GL.Translate((float)x * 5f, 0f, (float)z * 5f);
-                    rotation = (rotation < 360f) ? (rotation + (float)e.Time) : 0f;
+                    //rotation = (rotation < 360f) ? (rotation + (float)e.Time) : 0f;
+                    
                     if (x % 2 == 0) //pyramids
                     {
-                        //GL.Begin(BeginMode.TriangleFan);
-                       
-                        //GL.Color3(Color.Red);
-                        //GL.Vertex3(cameraMatrix.Column1.X, 1f, cameraMatrix.Column1.Z); //0
-                        //GL.Color3(Color.Orange);
-                        //GL.Vertex3(-1f, -1f, 1f);
-                        //GL.Color3(Color.Yellow);
-                        //GL.Vertex3(1f, -1f, 1f);
-                        //GL.Color3(Color.Green);
-                        //GL.Vertex3(1f, -1f, -1f);
-                        //GL.Color3(Color.Blue);
-                        //GL.Vertex3(-1f, -1f, -1f);
-                        //GL.Color3(Color.Indigo);
-                        //GL.Vertex3(-1f, -1f, 1f);
-                        GL.VertexPointer(3, VertexPointerType.Float, 0, pyramid);
-                        GL.ColorPointer(4, ColorPointerType.Float, 0, pyramidColors);
-                        GL.DrawElements(BeginMode.TriangleFan, 6, DrawElementsType.UnsignedByte, pyramid);
+                        GL.Begin(BeginMode.TriangleFan);
+                        GL.Color3(Color.Red);
+                        GL.Vertex3(cameraMatrix.Column1.X, 1f, cameraMatrix.Column1.Z); //0 //I want to make it point to where the camera is
+                        GL.Color3(Color.Orange);
+                        GL.Vertex3(-rotation, -1f, rotation);
+                        GL.Color3(Color.Yellow);
+                        GL.Vertex3(rotation, -1f, rotation);
+                        GL.Color3(Color.Green);
+                        GL.Vertex3(rotation, -1f, -rotation);
+                        GL.Color3(Color.Blue);
+                        GL.Vertex3(-rotation, -1f, -rotation);
+                        GL.Color3(Color.Indigo);
+                        GL.Vertex3(-rotation, -1f, rotation);
+                        //GL.VertexPointer(3, VertexPointerType.Float, 0, pyramid);
+                        //GL.ColorPointer(4, ColorPointerType.Float, 0, pyramidColors);
+                        //GL.DrawElements(BeginMode.TriangleFan, 6, DrawElementsType.UnsignedByte, pyramid);
 
                     }
                     if (z % 3 == 0)  //cubes
@@ -238,6 +239,13 @@ namespace CS177Project
 
             if (Keyboard[Key.Escape])
                 Exit();
+            
+            rotation -= crement;
+            if (rotation <= -1f || rotation >=1f)
+            {
+                crement *= -1;
+            }
+            Console.WriteLine(rotation);
         }
 
         /// <summary>
