@@ -139,48 +139,51 @@ namespace CS177Project
                     GL.Translate((float)x * 5f, 0f, (float)z * 5f);
                     //rotation = (rotation < 360f) ? (rotation + (float)e.Time) : 0f;
                     
-                    if (x % 2 == 0) //pyramids
+                    if (x % 3 == 0) //pyramids
                     {
-                        GL.Begin(BeginMode.TriangleFan);
-                        GL.Color3(Color.Red);
-                        GL.Vertex3(cameraMatrix.Column1.X, 1f, cameraMatrix.Column1.Z); //0 //I want to make it point to where the camera is
-                        GL.Color3(Color.Orange);
-                        GL.Vertex3(-rotation, -1f, rotation);
-                        GL.Color3(Color.Yellow);
-                        GL.Vertex3(rotation, -1f, rotation);
-                        GL.Color3(Color.Green);
-                        GL.Vertex3(rotation, -1f, -rotation);
-                        GL.Color3(Color.Blue);
-                        GL.Vertex3(-rotation, -1f, -rotation);
-                        GL.Color3(Color.Indigo);
-                        GL.Vertex3(-rotation, -1f, rotation);
-                        //GL.VertexPointer(3, VertexPointerType.Float, 0, pyramid);
-                        //GL.ColorPointer(4, ColorPointerType.Float, 0, pyramidColors);
-                        //GL.DrawElements(BeginMode.TriangleFan, 6, DrawElementsType.UnsignedByte, pyramid);
+                        if (z % 3 == 0)
+                        {
+                            generatePyramid();
+                        }
+                        else if (z % 3 == 1)
+                        {
+                            generateCube();
+                        }
+                        else if (z % 3 == 2)
+                        {
+                            generateSphere();
+                        }
 
                     }
-                    if (z % 3 == 0)  //cubes
+                    else if (x % 3 == 1)  //cubes
                     {
-                        GL.VertexPointer(3, VertexPointerType.Float, 0, cube);
-                        GL.ColorPointer(4, ColorPointerType.Float, 0, cubeColors);
-                        GL.DrawElements(BeginMode.Triangles, 36, DrawElementsType.UnsignedByte, cubeTriangles);
+                        if (z % 3 == 0)
+                        {
+                            generateCube();
+                        }
+                        else if (z % 3 == 1)
+                        {
+                            generateSphere();
+                        }
+                        else if (z % 3 == 2)
+                        {
+                            generatePyramid();
+                        }
                     }
-                    else //spheres
+                    else if (x % 3 == 2) //spheres
                     {
-                        GL.Begin(BeginMode.TriangleFan);
-                        //GL.ColorPointer(3, ColorPointerType.Float, 0, pyramidColors);
-                        GL.Color3(Color.Blue);
-                        GL.Vertex3(cameraMatrix.Column1.X, 1f, cameraMatrix.Column1.Z); //0
-                        //GL.Color3(Color.Orange);
-                        GL.Vertex3(-1f, -1f, 1f);
-                        // GL.Color3(Color.Yellow);
-                        GL.Vertex3(1f, -1f, 1f);
-                        //GL.Color3(Color.Green);
-                        GL.Vertex3(1f, -1f, -1f);
-                        //GL.Color3(Color.Blue);
-                        GL.Vertex3(-1f, -1f, -1f);
-                        //GL.Color3(Color.Indigo);
-                        GL.Vertex3(-1f, -1f, 1f);
+                        if (z % 3 == 0)
+                        {
+                            generateSphere();
+                        }
+                        else if (z % 3 == 1)
+                        {
+                            generatePyramid();
+                        }
+                        else if (z % 3 == 2)
+                        {
+                            generateCube();
+                        }
                     }
 
                     //GL.VertexPointer(3, VertexPointerType.Float, 0, pyramidShape);
@@ -280,6 +283,51 @@ namespace CS177Project
                 game.Run(30.0);
             }
 
+        }
+
+        void generateCube()
+        {
+            GL.VertexPointer(3, VertexPointerType.Float, 0, cube);
+            GL.ColorPointer(4, ColorPointerType.Float, 0, cubeColors);
+            GL.DrawElements(BeginMode.Triangles, 36, DrawElementsType.UnsignedByte, cubeTriangles);
+        }
+
+        void generatePyramid()
+        {
+            GL.Begin(BeginMode.TriangleFan);
+            GL.Color3(Color.Red);
+            GL.Vertex3(cameraMatrix.Column1.X, 1f, cameraMatrix.Column1.Z); //0 //I want to make it point to where the camera is
+            GL.Color3(Color.Orange);
+            GL.Vertex3(-rotation, -1f, rotation);
+            GL.Color3(Color.Yellow);
+            GL.Vertex3(rotation, -1f, rotation);
+            GL.Color3(Color.Green);
+            GL.Vertex3(rotation, -1f, -rotation);
+            GL.Color3(Color.Blue);
+            GL.Vertex3(-rotation, -1f, -rotation);
+            GL.Color3(Color.Indigo);
+            GL.Vertex3(-rotation, -1f, rotation);
+            //GL.VertexPointer(3, VertexPointerType.Float, 0, pyramid);
+            //GL.ColorPointer(4, ColorPointerType.Float, 0, pyramidColors);
+            //GL.DrawElements(BeginMode.TriangleFan, 6, DrawElementsType.UnsignedByte, pyramid);
+        }
+
+        void generateSphere()
+        {
+            GL.Begin(BeginMode.TriangleFan);
+            //GL.ColorPointer(3, ColorPointerType.Float, 0, pyramidColors);
+            GL.Color3(Color.Blue);
+            GL.Vertex3(cameraMatrix.Column1.X, 1f, cameraMatrix.Column1.Z); //0
+            //GL.Color3(Color.Orange);
+            GL.Vertex3(-1f, -1f, 1f);
+            // GL.Color3(Color.Yellow);
+            GL.Vertex3(1f, -1f, 1f);
+            //GL.Color3(Color.Green);
+            GL.Vertex3(1f, -1f, -1f);
+            //GL.Color3(Color.Blue);
+            GL.Vertex3(-1f, -1f, -1f);
+            //GL.Color3(Color.Indigo);
+            GL.Vertex3(-1f, -1f, 1f);
         }
 
     }
