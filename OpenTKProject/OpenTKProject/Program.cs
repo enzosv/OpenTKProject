@@ -8,7 +8,6 @@ using OpenTK.Input;
 using System.Windows.Forms;
 
 //sources http://www.opentk.com/node/1492?page=1s
-//http://code.google.com/p/speedprogramming/
 //http://www.opentk.com/node/2873 rotating cube
 //http://www.opentk.com/node/1800 sphere
 namespace CS177Project
@@ -16,8 +15,8 @@ namespace CS177Project
     class Game : GameWindow
     {
         private Matrix4 cameraMatrix;
-        private float mouseX, forwardZ, sideX, rotation = 1f, crement = 0.03f, crement2 = 0.05f;
-        private bool zoomed;
+        private float mouseX, forwardZ, sideX, rotation = 1f, crement = 0.03f, crement2;
+        private bool zoomed, direction;
         #region Pyriamids
         float[] pyramid = 
         {
@@ -53,7 +52,7 @@ namespace CS177Project
             Color.Indigo.R, Color.Indigo.G, Color.Indigo.B,
         };
         #endregion
-        #region Cube information
+        #region Cubes
 
         float[] cubeColors = {
 			1, 0, 0,
@@ -119,7 +118,7 @@ namespace CS177Project
 
             zoomed = false;
 
-            
+
 
         }
 
@@ -210,19 +209,21 @@ namespace CS177Project
             float speed = 15f * (float)e.Time;
             forwardZ = 0f;
             sideX = 0f;
-  
-            if (Mouse.Wheel !=1 && zoomed)
+
+            #region controls
+            if (Mouse.Wheel != 1 && zoomed)
             {
                 cameraMatrix *= Matrix4.CreateTranslation(0f, 0f, -3f);
                 zoomed = false;
             }
             if (!zoomed)
             {
-                if (Mouse.Wheel !=0)
+                if (Mouse.Wheel != 0)
                 {
                     cameraMatrix *= Matrix4.CreateTranslation(0f, 0f, 3f);
                     zoomed = true;
                 }
+                #region WASD
                 if (Keyboard[Key.W])
                 {
                     forwardZ = speed;
@@ -241,7 +242,9 @@ namespace CS177Project
                 {
                     sideX = -speed;
                 }
+                #endregion
             }
+            #endregion
 
             cameraMatrix *= Matrix4.CreateTranslation(sideX, 0f, forwardZ);
 
@@ -264,25 +267,20 @@ namespace CS177Project
             if (rotation <= -1f || rotation >= 0.99f)
             {
                 crement *= -1;
+                direction = !direction;
             }
-
-            for (int x = 0; x < 22; x += 3)
-            {
-                float orig = cube[x];
-                cube[x] -= crement;
-                //if (orig < -1.5f || orig > 1.5f)
-                //{
-                //    crement2 *= -1;
-                //}
-                //Console.WriteLine(cube[x]);
-
-            }
-            for (int x = 2; x < 24; x += 3)
+            int y;
+            if (direction) //horizontal
+                y = 2;
+            else
+                y = 0;
+            for (int x = y; x < 24; x += 3)
             {
                 float orig = cube[x];
                 cube[x] -= crement;
             }
             //Console.WriteLine(rotation);
+            //negative positive positive negative dapat
         }
 
         /// <summary>
