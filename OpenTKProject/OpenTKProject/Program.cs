@@ -16,7 +16,7 @@ namespace CS177Project
     class Game : GameWindow
     {
         private Matrix4 cameraMatrix;
-        private float mouseX, forwardZ, sideX, rotation = 1f, crement = 0.03f;
+        private float mouseX, forwardZ, sideX, rotation = 1f, crement = 0.03f, crement2 = 0.05f;
         private bool zoomed;
         #region Pyriamids
         float[] pyramid = 
@@ -119,6 +119,8 @@ namespace CS177Project
 
             zoomed = false;
 
+            
+
         }
 
         /// <summary>
@@ -208,17 +210,15 @@ namespace CS177Project
             float speed = 15f * (float)e.Time;
             forwardZ = 0f;
             sideX = 0f;
-
-
-            
-            if (Mouse.Wheel == 0 && zoomed)
+  
+            if (Mouse.Wheel !=1 && zoomed)
             {
                 cameraMatrix *= Matrix4.CreateTranslation(0f, 0f, -3f);
                 zoomed = false;
             }
             if (!zoomed)
             {
-                if (Mouse.Wheel == 1)
+                if (Mouse.Wheel !=0)
                 {
                     cameraMatrix *= Matrix4.CreateTranslation(0f, 0f, 3f);
                     zoomed = true;
@@ -243,7 +243,6 @@ namespace CS177Project
                 }
             }
 
-            Console.WriteLine(Mouse.WheelPrecise);
             cameraMatrix *= Matrix4.CreateTranslation(sideX, 0f, forwardZ);
 
             cameraMatrix *= Matrix4.CreateRotationY(mouseX);
@@ -265,6 +264,23 @@ namespace CS177Project
             if (rotation <= -1f || rotation >= 0.99f)
             {
                 crement *= -1;
+            }
+
+            for (int x = 0; x < 22; x += 3)
+            {
+                float orig = cube[x];
+                cube[x] -= crement;
+                //if (orig < -1.5f || orig > 1.5f)
+                //{
+                //    crement2 *= -1;
+                //}
+                //Console.WriteLine(cube[x]);
+
+            }
+            for (int x = 2; x < 24; x += 3)
+            {
+                float orig = cube[x];
+                cube[x] -= crement;
             }
             //Console.WriteLine(rotation);
         }
