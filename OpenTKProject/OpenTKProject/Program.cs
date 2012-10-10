@@ -17,6 +17,7 @@ namespace CS177Project
     {
         private Matrix4 cameraMatrix;
         private float mouseX, forwardZ, sideX, rotation = 1f, crement = 0.03f;
+        private bool zoomed;
         #region Pyriamids
         float[] pyramid = 
         {
@@ -116,6 +117,8 @@ namespace CS177Project
             //Cursor.Hide();
             Cursor.Position = new Point(Screen.PrimaryScreen.Bounds.Right / 2, Screen.PrimaryScreen.Bounds.Bottom / 2);
 
+            zoomed = true;
+
         }
 
         /// <summary>
@@ -139,7 +142,7 @@ namespace CS177Project
                     GL.Translate((float)x * 5f, 0f, (float)z * 5f);
                     //rotation = (rotation < 360f) ? (rotation + (float)e.Time) : 0f;
                     
-                    if (x % 3 == 0) //pyramids
+                    if (x % 3 == 0)
                     {
                         if (z % 3 == 0)
                         {
@@ -155,7 +158,7 @@ namespace CS177Project
                         }
 
                     }
-                    else if (x % 3 == 1)  //cubes
+                    else if (x % 3 == 1)
                     {
                         if (z % 3 == 0)
                         {
@@ -170,7 +173,7 @@ namespace CS177Project
                             generatePyramid();
                         }
                     }
-                    else if (x % 3 == 2) //spheres
+                    else if (x % 3 == 2)
                     {
                         if (z % 3 == 0)
                         {
@@ -186,9 +189,6 @@ namespace CS177Project
                         }
                     }
 
-                    //GL.VertexPointer(3, VertexPointerType.Float, 0, pyramidShape);
-
-                    //GL.DrawElements(BeginMode.TriangleFan, 36, DrawElementsType.UnsignedByte, triangles);
 
                     GL.End();
                     GL.PopMatrix();
@@ -226,6 +226,17 @@ namespace CS177Project
             {
                 sideX = -speed;
             }
+
+            if (Mouse.Wheel == 1 && zoomed)
+            {
+                cameraMatrix *= Matrix4.CreateTranslation(0f, 2f, 2f);
+                zoomed = false;
+            }
+            else if (Mouse.Wheel == 0 && !zoomed)
+            {
+                cameraMatrix *= Matrix4.CreateTranslation(0f, -2f, -2f);
+                zoomed = true;
+            }
             cameraMatrix *= Matrix4.CreateTranslation(sideX, 0f, forwardZ);
 
             cameraMatrix *= Matrix4.CreateRotationY(mouseX);
@@ -248,7 +259,7 @@ namespace CS177Project
             {
                 crement *= -1;
             }
-            Console.WriteLine(rotation);
+            //Console.WriteLine(rotation);
         }
 
         /// <summary>
@@ -296,7 +307,7 @@ namespace CS177Project
         {
             GL.Begin(BeginMode.TriangleFan);
             GL.Color3(Color.Red);
-            GL.Vertex3(cameraMatrix.Column1.X, 1f, cameraMatrix.Column1.Z); //0 //I want to make it point to where the camera is
+            GL.Vertex3(0, 1f, 0); //0 //I want to make it point to where the camera is
             GL.Color3(Color.Orange);
             GL.Vertex3(-rotation, -1f, rotation);
             GL.Color3(Color.Yellow);
