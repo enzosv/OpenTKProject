@@ -117,7 +117,7 @@ namespace CS177Project
             //Cursor.Hide();
             Cursor.Position = new Point(Screen.PrimaryScreen.Bounds.Right / 2, Screen.PrimaryScreen.Bounds.Bottom / 2);
 
-            zoomed = true;
+            zoomed = false;
 
         }
 
@@ -133,7 +133,7 @@ namespace CS177Project
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
             GL.LoadMatrix(ref cameraMatrix);
             //rotation = (rotation > 0f) ? (rotation - 1 / 30) : 1f;
-           
+
             for (int x = 0; x <= 20; x++)
             {
                 for (int z = 0; z <= 20; z++)
@@ -141,7 +141,7 @@ namespace CS177Project
                     GL.PushMatrix();
                     GL.Translate((float)x * 5f, 0f, (float)z * 5f);
                     //rotation = (rotation < 360f) ? (rotation + (float)e.Time) : 0f;
-                    
+
                     if (x % 3 == 0)
                     {
                         if (z % 3 == 0)
@@ -208,35 +208,42 @@ namespace CS177Project
             float speed = 15f * (float)e.Time;
             forwardZ = 0f;
             sideX = 0f;
-            if (Keyboard[Key.W])
-            {
-                forwardZ = speed;
-            }
-            else if (Keyboard[Key.S])
-            {
-                forwardZ = -speed;
-            }
 
-            if (Keyboard[Key.A])
-            {
-                sideX = speed;
-            }
 
-            else if (Keyboard[Key.D])
+            
+            if (Mouse.Wheel == 0 && zoomed)
             {
-                sideX = -speed;
-            }
-
-            if (Mouse.Wheel == 1 && zoomed)
-            {
-                cameraMatrix *= Matrix4.CreateTranslation(0f, 2f, 2f);
+                cameraMatrix *= Matrix4.CreateTranslation(0f, 0f, -3f);
                 zoomed = false;
             }
-            else if (Mouse.Wheel == 0 && !zoomed)
+            if (!zoomed)
             {
-                cameraMatrix *= Matrix4.CreateTranslation(0f, -2f, -2f);
-                zoomed = true;
+                if (Mouse.Wheel == 1)
+                {
+                    cameraMatrix *= Matrix4.CreateTranslation(0f, 0f, 3f);
+                    zoomed = true;
+                }
+                if (Keyboard[Key.W])
+                {
+                    forwardZ = speed;
+                }
+                else if (Keyboard[Key.S])
+                {
+                    forwardZ = -speed;
+                }
+
+                if (Keyboard[Key.A])
+                {
+                    sideX = speed;
+                }
+
+                else if (Keyboard[Key.D])
+                {
+                    sideX = -speed;
+                }
             }
+
+            Console.WriteLine(Mouse.WheelPrecise);
             cameraMatrix *= Matrix4.CreateTranslation(sideX, 0f, forwardZ);
 
             cameraMatrix *= Matrix4.CreateRotationY(mouseX);
@@ -253,9 +260,9 @@ namespace CS177Project
 
             if (Keyboard[Key.Escape])
                 Exit();
-            
+
             rotation -= crement;
-            if (rotation <= -1f || rotation >=0.99f)
+            if (rotation <= -1f || rotation >= 0.99f)
             {
                 crement *= -1;
             }
