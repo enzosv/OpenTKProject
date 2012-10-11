@@ -213,7 +213,7 @@ namespace CS177Project
 
             #region controls
 
-            if (OpenTK.Input.Mouse.GetState().IsButtonDown(MouseButton.Left) && zoomed)
+            if (OpenTK.Input.Mouse.GetState().IsButtonDown(MouseButton.Right) && zoomed)
             {
                 cameraMatrix *= Matrix4.CreateTranslation(0f, 0f, -3f);
                 zoomed = false;
