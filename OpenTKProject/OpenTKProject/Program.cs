@@ -78,8 +78,9 @@ namespace CS177Project
             GL.Enable(EnableCap.CullFace);
             GL.EnableClientState(EnableCap.VertexArray);
             GL.EnableClientState(EnableCap.ColorArray);
-            //cameraMatrix = Matrix4.CreateTranslation(0f, 0f, 0f);
-            cameraMatrix = Matrix4.CreateRotationY(10);
+            
+            //cameraMatrix = Matrix4.CreateRotationY(10);
+            cameraMatrix = Matrix4.CreateTranslation(-75f, 0f, -75f);
             Cursor.Hide();
             Cursor.Position = new Point(Screen.PrimaryScreen.Bounds.Right / 2, Screen.PrimaryScreen.Bounds.Bottom / 2);
 
