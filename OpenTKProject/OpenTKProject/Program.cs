@@ -18,7 +18,7 @@ namespace CS177Project
         private Matrix4 cameraMatrix;
         private float mouseX, forwardZ, sideX, rotation, crement, crement2;
         private bool zoomed, direction;
-        private int n;
+        private int n, awesomesauce;
         #region Pyriamids
         float[] pyramid = 
         {
@@ -122,6 +122,7 @@ namespace CS177Project
             rotation = 1f;
             crement = 0.03f;
             n = 0;
+            awesomesauce = 1;
 
 
         }
@@ -271,7 +272,6 @@ namespace CS177Project
             {
                 crement *= -1;
                 direction = !direction;
-                n++;
             }
 
             int y;
@@ -279,25 +279,24 @@ namespace CS177Project
                 y = 2;
             else
                 y = 0;
-            if (n % 3 == 0)
+            if (n == 10)
             {
-                
                 crement2 = -crement;
+                awesomesauce = -1;
                 Console.WriteLine(crement2);
             }
-            else
+            else if (n == 0)
             {
                 crement2 = crement;
+                awesomesauce = 1;
                 Console.WriteLine(crement2);
             }
             for (int x = y; x < 24; x += 3)
             {
                 float orig = cube[x];
-
-
                 cube[x] += crement2;
-
             }
+            n += awesomesauce;
             //Console.WriteLine(rotation);
             //negative positive positive negative dapat
         }
