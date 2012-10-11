@@ -16,7 +16,7 @@ namespace CS177Project
     class Game : GameWindow
     {
         private Matrix4 cameraMatrix;
-        private float speed, mouseX, forwardZ, sideX, rotation, crement, crement2, crement3, look, jump;
+        private float speed, mouseX, forwardZ, sideX, rotation, crement, crement2, crement3, look, jump, up, gravity;
         private bool zoomed, direction;
         private int n, awesomesauce;
         #region Cubes
@@ -89,6 +89,7 @@ namespace CS177Project
             n = 0;
             awesomesauce = 1;
             crement3 = 0.1f;
+            gravity = 0;
         }
 
         /// <summary>
@@ -175,6 +176,7 @@ namespace CS177Project
             look = 150f;
             forwardZ = 0f;
             sideX = 0f;
+            up = 0;
 
             #region controls
             #region zoom
@@ -198,6 +200,15 @@ namespace CS177Project
             }
             #endregion
             #region WASD
+            if (Keyboard[Key.ShiftLeft] || Keyboard[Key.ShiftRight])
+            {
+                speed *= 1.5f;
+            }
+            //if (Keyboard[Key.Space])
+            //{
+            //    up -= 0.2f;
+            //    //up = (up > 1f) ? (up - 0.1f) : 0f;	
+            //}
             if (Keyboard[Key.W])
             {
                 forwardZ = speed;
@@ -216,10 +227,19 @@ namespace CS177Project
             {
                 sideX = -speed;
             }
-            #endregion
-            #endregion
 
-            cameraMatrix *= Matrix4.CreateTranslation(sideX, 0f, forwardZ);
+            
+            #endregion
+            #endregion
+            //if (up < 0)
+            //{
+            //    gravity = 0.1f;
+            //}
+            //else
+            //{
+            //    gravity = 0;
+            //}
+            cameraMatrix *= Matrix4.CreateTranslation(sideX, up, forwardZ);
 
             cameraMatrix *= Matrix4.CreateRotationY(mouseX);
             mouseX = Mouse.XDelta / look;
@@ -337,9 +357,6 @@ namespace CS177Project
             GL.Vertex3(-rotation, -1f, -rotation);
             GL.Color3(Color.Indigo);
             GL.Vertex3(-rotation, -1f, rotation);
-            //GL.VertexPointer(3, VertexPointerType.Float, 0, pyramid);
-            //GL.ColorPointer(4, ColorPointerType.Float, 0, pyramidColors);
-            //GL.DrawElements(BeginMode.TriangleFan, 6, DrawElementsType.UnsignedByte, pyramid);
         }
 
         void generateDiamond()
