@@ -371,7 +371,7 @@ namespace CS177Project
 
         void generateDiamond()
         {
-            GL.Rotate(rot, 1, 0, 0);
+            GL.Rotate(rot, 0, 1, 0);
             GL.Begin(BeginMode.TriangleFan);
             GL.Color3(Color.Red);
             GL.Vertex3(0, 1f+jump, 0);
