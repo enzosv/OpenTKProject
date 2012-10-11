@@ -16,44 +16,9 @@ namespace CS177Project
     class Game : GameWindow
     {
         private Matrix4 cameraMatrix;
-        private float speed, mouseX, forwardZ, sideX, rotation, crement, crement2;
+        private float speed, mouseX, forwardZ, sideX, rotation, crement, crement2, crement3, look, jump;
         private bool zoomed, direction;
         private int n, awesomesauce;
-        #region Pyriamids
-        float[] pyramid = 
-        {
-            0f, 1f,0f,
-            -1f, -1f, 1f,
-            1f, -1f, 1f,
-            1f, -1f, -1f,
-            -1f, -1f, -1f,
-            -1f, -1f, 1f
-        };
-        byte[] pyramidTriangles =
-		{
-			1, 0, 2, // front
-			3, 2, 0,
-			6, 4, 5, // back
-			4, 6, 7,
-			4, 7, 0, // left
-			7, 3, 0,
-			1, 2, 5, //right
-			2, 6, 5,
-			0, 1, 5, // top
-			0, 5, 4,
-			2, 3, 6, // bottom
-			3, 7, 6,
-		};
-        float[] pyramidColors = 
-        {
-            1, 0, 0,
-            Color.Orange.R, Color.Orange.G, Color.Orange.B,
-            Color.Yellow.R, Color.Yellow.G, Color.Yellow.B,
-            0, 1, 1,
-            1, 0, 0,
-            Color.Indigo.R, Color.Indigo.G, Color.Indigo.B,
-        };
-        #endregion
         #region Cubes
 
         float[] cubeColors = {
@@ -123,8 +88,7 @@ namespace CS177Project
             crement = 0.03f;
             n = 0;
             awesomesauce = 1;
-
-
+            crement3 = 0.1f;
         }
 
         /// <summary>
@@ -208,16 +172,16 @@ namespace CS177Project
         protected override void OnUpdateFrame(FrameEventArgs e)
         {
             speed = 15f * (float)e.Time;
+            look = 150f;
             forwardZ = 0f;
             sideX = 0f;
 
             #region controls
-
-
-
+            #region zoom
             if (zoomed)
             {
                 speed /= 10;
+                look /= 2;
                 if (OpenTK.Input.Mouse.GetState().IsButtonDown(MouseButton.Right))
                 {
                     cameraMatrix *= Matrix4.CreateTranslation(0f, 0f, -3f);
@@ -232,6 +196,7 @@ namespace CS177Project
                     zoomed = true;
                 }
             }
+            #endregion
             #region WASD
             if (Keyboard[Key.W])
             {
@@ -257,7 +222,7 @@ namespace CS177Project
             cameraMatrix *= Matrix4.CreateTranslation(sideX, 0f, forwardZ);
 
             cameraMatrix *= Matrix4.CreateRotationY(mouseX);
-            mouseX = Mouse.XDelta / 150f;
+            mouseX = Mouse.XDelta / look;
             //mouseY = Mouse.YDelta / 150f;
             if (Cursor.Position.X >= Screen.PrimaryScreen.Bounds.Right - 1)
             {
@@ -271,14 +236,16 @@ namespace CS177Project
             if (Keyboard[Key.Escape])
                 Exit();
 
+            
+            #region pyramidMovement
             rotation -= crement;
-
             if (rotation <= -1f || rotation >= 0.99f)
             {
                 crement *= -1;
                 direction = !direction;
             }
-
+            #endregion
+            #region cubeMovement
             int y;
             if (direction) //horizontal
                 y = 2;
@@ -288,13 +255,13 @@ namespace CS177Project
             {
                 crement2 = -crement;
                 awesomesauce = -1;
-                Console.WriteLine(crement2);
+                //Console.WriteLine(crement2);
             }
             else if (n == 0)
             {
                 crement2 = crement;
                 awesomesauce = 1;
-                Console.WriteLine(crement2);
+                //Console.WriteLine(crement2);
             }
             for (int x = y; x < 24; x += 3)
             {
@@ -302,6 +269,14 @@ namespace CS177Project
                 cube[x] += crement2;
             }
             n += awesomesauce;
+            #endregion
+            #region diamondMovement
+            jump += crement3;
+            if (jump <= 0f || jump >= 0.99f)
+            {
+                crement3 *= -1;
+            }	
+            #endregion
             //Console.WriteLine(rotation);
             //negative positive positive negative dapat
         }
@@ -371,66 +346,66 @@ namespace CS177Project
         {
             GL.Begin(BeginMode.TriangleFan);
             GL.Color3(Color.Red);
-            GL.Vertex3(0, 1f, 0);
+            GL.Vertex3(0, 1f+jump, 0);
 
             GL.Color3(Color.OrangeRed);
-            GL.Vertex3(-1f, 0f, 1f);
+            GL.Vertex3(-1f, jump, 1f);
 
             GL.Color3(Color.Orange);
-            GL.Vertex3(0f, 0f, 1.5f);
+            GL.Vertex3(0f, jump, 1.5f);
 
             GL.Color3(Color.Yellow);
-            GL.Vertex3(1f, 0f, 1f);
+            GL.Vertex3(1f, jump, 1f);
 
             GL.Color3(Color.YellowGreen);
-            GL.Vertex3(1.5f, 0f, 0f);
+            GL.Vertex3(1.5f, jump, 0f);
 
             GL.Color3(Color.Green);
-            GL.Vertex3(1f, 0f, -1f);
+            GL.Vertex3(1f, jump, -1f);
 
             GL.Color3(Color.SeaGreen);
-            GL.Vertex3(0f, 0f, -1.5f);
+            GL.Vertex3(0f, jump, -1.5f);
 
             GL.Color3(Color.Blue);
-            GL.Vertex3(-1f, 0f, -1f);
+            GL.Vertex3(-1f, jump, -1f);
 
             GL.Color3(Color.Violet);
-            GL.Vertex3(-1.5f, 0f, 0f);
+            GL.Vertex3(-1.5f, jump, 0f);
 
             GL.Color3(Color.Indigo);
-            GL.Vertex3(-1f, 0f, 1f);
+            GL.Vertex3(-1f, jump, 1f);
             GL.End();
 
             GL.Begin(BeginMode.TriangleFan);
             GL.Color3(Color.Red);
-            GL.Vertex3(0, -1f, 0);
+            GL.Vertex3(0, -1f+jump, 0);
 
             GL.Color3(Color.OrangeRed);
-            GL.Vertex3(-1f, 0f, 1f);
+            GL.Vertex3(-1f, jump, 1f);
 
             GL.Color3(Color.Orange);
-            GL.Vertex3(0f, 0f, 1.5f);
+            GL.Vertex3(0f, jump, 1.5f);
 
             GL.Color3(Color.Yellow);
-            GL.Vertex3(1f, 0f, 1f);
+            GL.Vertex3(1f, jump, 1f);
 
             GL.Color3(Color.YellowGreen);
-            GL.Vertex3(1.5f, 0f, 0f);
+            GL.Vertex3(1.5f, jump, 0f);
 
             GL.Color3(Color.Green);
-            GL.Vertex3(1f, 0f, -1f);
+            GL.Vertex3(1f, jump, -1f);
 
             GL.Color3(Color.SeaGreen);
-            GL.Vertex3(0f, 0f, -1.5f);
+            GL.Vertex3(0f, jump, -1.5f);
 
             GL.Color3(Color.Blue);
-            GL.Vertex3(-1f, 0f, -1f);
+            GL.Vertex3(-1f, jump, -1f);
 
             GL.Color3(Color.Violet);
-            GL.Vertex3(-1.5f, 0f, 0f);
+            GL.Vertex3(-1.5f, jump, 0f);
 
             GL.Color3(Color.Indigo);
-            GL.Vertex3(-1f, 0f, 1f);
+            GL.Vertex3(-1f, jump, 1f);
         }
 
     }
