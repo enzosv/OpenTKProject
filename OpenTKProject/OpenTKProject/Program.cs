@@ -7,7 +7,8 @@ using OpenTK.Graphics.OpenGL;
 using OpenTK.Input;
 using System.Windows.Forms;
 
-//sources http://www.opentk.com/node/1492?page=1s
+//sources 
+//http://www.opentk.com/node/1492?page=1s fps camera
 //http://www.opentk.com/node/2873 rotating cube
 //http://www.opentk.com/node/1800 sphere
 namespace CS177Project
@@ -113,7 +114,7 @@ namespace CS177Project
             GL.EnableClientState(EnableCap.ColorArray);
             //cameraMatrix = Matrix4.CreateTranslation(0f, 0f, 0f);
             cameraMatrix = Matrix4.CreateRotationY(10);
-            //Cursor.Hide();
+            Cursor.Hide();
             Cursor.Position = new Point(Screen.PrimaryScreen.Bounds.Right / 2, Screen.PrimaryScreen.Bounds.Bottom / 2);
 
             zoomed = false;
@@ -211,14 +212,15 @@ namespace CS177Project
             sideX = 0f;
 
             #region controls
-            if (Mouse.Wheel != 1 && zoomed)
+
+            if (OpenTK.Input.Mouse.GetState().IsButtonDown(MouseButton.Left) && zoomed)
             {
                 cameraMatrix *= Matrix4.CreateTranslation(0f, 0f, -3f);
                 zoomed = false;
             }
-            if (!zoomed)
+            if(!zoomed)
             {
-                if (Mouse.Wheel != 0)
+                if (OpenTK.Input.Mouse.GetState().IsButtonDown(MouseButton.Left))
                 {
                     cameraMatrix *= Matrix4.CreateTranslation(0f, 0f, 3f);
                     zoomed = true;
@@ -244,6 +246,7 @@ namespace CS177Project
                 }
                 #endregion
             }
+            
             #endregion
 
             cameraMatrix *= Matrix4.CreateTranslation(sideX, 0f, forwardZ);
