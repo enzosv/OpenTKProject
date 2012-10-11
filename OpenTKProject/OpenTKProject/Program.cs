@@ -16,7 +16,7 @@ namespace CS177Project
     class Game : GameWindow
     {
         private Matrix4 cameraMatrix;
-        private float mouseX, forwardZ, sideX, rotation, crement, crement2;
+        private float speed, mouseX, forwardZ, sideX, rotation, crement, crement2;
         private bool zoomed, direction;
         private int n, awesomesauce;
         #region Pyriamids
@@ -160,7 +160,7 @@ namespace CS177Project
                         }
                         else if (z % 3 == 2)
                         {
-                            generateSphere();
+                            generateDiamond();
                         }
 
                     }
@@ -172,7 +172,7 @@ namespace CS177Project
                         }
                         else if (z % 3 == 1)
                         {
-                            generateSphere();
+                            generateDiamond();
                         }
                         else if (z % 3 == 2)
                         {
@@ -183,7 +183,7 @@ namespace CS177Project
                     {
                         if (z % 3 == 0)
                         {
-                            generateSphere();
+                            generateDiamond();
                         }
                         else if (z % 3 == 1)
                         {
@@ -207,46 +207,51 @@ namespace CS177Project
         /// <param name="e">Contains timing information for framerate independent logic.</param>
         protected override void OnUpdateFrame(FrameEventArgs e)
         {
-            float speed = 15f * (float)e.Time;
+            speed = 15f * (float)e.Time;
             forwardZ = 0f;
             sideX = 0f;
 
             #region controls
 
-            if (OpenTK.Input.Mouse.GetState().IsButtonDown(MouseButton.Right) && zoomed)
+
+
+            if (zoomed)
             {
-                cameraMatrix *= Matrix4.CreateTranslation(0f, 0f, -3f);
-                zoomed = false;
+                speed /= 10;
+                if (OpenTK.Input.Mouse.GetState().IsButtonDown(MouseButton.Right))
+                {
+                    cameraMatrix *= Matrix4.CreateTranslation(0f, 0f, -3f);
+                    zoomed = false;
+                }
             }
-            if (!zoomed)
+            else
             {
-                if (OpenTK.Input.Mouse.GetState().IsButtonDown(MouseButton.Left))
+                if (OpenTK.Input.Mouse.GetState().IsButtonDown(MouseButton.Left) && !zoomed)
                 {
                     cameraMatrix *= Matrix4.CreateTranslation(0f, 0f, 3f);
                     zoomed = true;
                 }
-                #region WASD
-                if (Keyboard[Key.W])
-                {
-                    forwardZ = speed;
-                }
-                else if (Keyboard[Key.S])
-                {
-                    forwardZ = -speed;
-                }
-
-                if (Keyboard[Key.A])
-                {
-                    sideX = speed;
-                }
-
-                else if (Keyboard[Key.D])
-                {
-                    sideX = -speed;
-                }
-                #endregion
+            }
+            #region WASD
+            if (Keyboard[Key.W])
+            {
+                forwardZ = speed;
+            }
+            else if (Keyboard[Key.S])
+            {
+                forwardZ = -speed;
             }
 
+            if (Keyboard[Key.A])
+            {
+                sideX = speed;
+            }
+
+            else if (Keyboard[Key.D])
+            {
+                sideX = -speed;
+            }
+            #endregion
             #endregion
 
             cameraMatrix *= Matrix4.CreateTranslation(sideX, 0f, forwardZ);
@@ -267,7 +272,7 @@ namespace CS177Project
                 Exit();
 
             rotation -= crement;
-            
+
             if (rotation <= -1f || rotation >= 0.99f)
             {
                 crement *= -1;
@@ -362,22 +367,70 @@ namespace CS177Project
             //GL.DrawElements(BeginMode.TriangleFan, 6, DrawElementsType.UnsignedByte, pyramid);
         }
 
-        void generateSphere()
+        void generateDiamond()
         {
             GL.Begin(BeginMode.TriangleFan);
-            //GL.ColorPointer(3, ColorPointerType.Float, 0, pyramidColors);
+            GL.Color3(Color.Red);
+            GL.Vertex3(0, 1f, 0);
+
+            GL.Color3(Color.OrangeRed);
+            GL.Vertex3(-1f, 0f, 1f);
+
+            GL.Color3(Color.Orange);
+            GL.Vertex3(0f, 0f, 1.5f);
+
+            GL.Color3(Color.Yellow);
+            GL.Vertex3(1f, 0f, 1f);
+
+            GL.Color3(Color.YellowGreen);
+            GL.Vertex3(1.5f, 0f, 0f);
+
+            GL.Color3(Color.Green);
+            GL.Vertex3(1f, 0f, -1f);
+
+            GL.Color3(Color.SeaGreen);
+            GL.Vertex3(0f, 0f, -1.5f);
+
             GL.Color3(Color.Blue);
-            GL.Vertex3(cameraMatrix.Column1.X, 1f, cameraMatrix.Column1.Z); //0
-            //GL.Color3(Color.Orange);
-            GL.Vertex3(-1f, -1f, 1f);
-            // GL.Color3(Color.Yellow);
-            GL.Vertex3(1f, -1f, 1f);
-            //GL.Color3(Color.Green);
-            GL.Vertex3(1f, -1f, -1f);
-            //GL.Color3(Color.Blue);
-            GL.Vertex3(-1f, -1f, -1f);
-            //GL.Color3(Color.Indigo);
-            GL.Vertex3(-1f, -1f, 1f);
+            GL.Vertex3(-1f, 0f, -1f);
+
+            GL.Color3(Color.Violet);
+            GL.Vertex3(-1.5f, 0f, 0f);
+
+            GL.Color3(Color.Indigo);
+            GL.Vertex3(-1f, 0f, 1f);
+            GL.End();
+
+            GL.Begin(BeginMode.TriangleFan);
+            GL.Color3(Color.Red);
+            GL.Vertex3(0, -1f, 0);
+
+            GL.Color3(Color.OrangeRed);
+            GL.Vertex3(-1f, 0f, 1f);
+
+            GL.Color3(Color.Orange);
+            GL.Vertex3(0f, 0f, 1.5f);
+
+            GL.Color3(Color.Yellow);
+            GL.Vertex3(1f, 0f, 1f);
+
+            GL.Color3(Color.YellowGreen);
+            GL.Vertex3(1.5f, 0f, 0f);
+
+            GL.Color3(Color.Green);
+            GL.Vertex3(1f, 0f, -1f);
+
+            GL.Color3(Color.SeaGreen);
+            GL.Vertex3(0f, 0f, -1.5f);
+
+            GL.Color3(Color.Blue);
+            GL.Vertex3(-1f, 0f, -1f);
+
+            GL.Color3(Color.Violet);
+            GL.Vertex3(-1.5f, 0f, 0f);
+
+            GL.Color3(Color.Indigo);
+            GL.Vertex3(-1f, 0f, 1f);
         }
 
     }
