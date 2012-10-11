@@ -16,8 +16,9 @@ namespace CS177Project
     class Game : GameWindow
     {
         private Matrix4 cameraMatrix;
-        private float mouseX, forwardZ, sideX, rotation = 1f, crement = 0.03f, crement2;
+        private float mouseX, forwardZ, sideX, rotation, crement, crement2;
         private bool zoomed, direction;
+        private int n;
         #region Pyriamids
         float[] pyramid = 
         {
@@ -118,7 +119,9 @@ namespace CS177Project
             Cursor.Position = new Point(Screen.PrimaryScreen.Bounds.Right / 2, Screen.PrimaryScreen.Bounds.Bottom / 2);
 
             zoomed = false;
-
+            rotation = 1f;
+            crement = 0.03f;
+            n = 0;
 
 
         }
@@ -190,14 +193,10 @@ namespace CS177Project
                             generateCube();
                         }
                     }
-
-
                     GL.End();
                     GL.PopMatrix();
                 }
             }
-
-
             SwapBuffers();
         }
 
@@ -218,7 +217,7 @@ namespace CS177Project
                 cameraMatrix *= Matrix4.CreateTranslation(0f, 0f, -3f);
                 zoomed = false;
             }
-            if(!zoomed)
+            if (!zoomed)
             {
                 if (OpenTK.Input.Mouse.GetState().IsButtonDown(MouseButton.Left))
                 {
@@ -246,7 +245,7 @@ namespace CS177Project
                 }
                 #endregion
             }
-            
+
             #endregion
 
             cameraMatrix *= Matrix4.CreateTranslation(sideX, 0f, forwardZ);
@@ -267,20 +266,37 @@ namespace CS177Project
                 Exit();
 
             rotation -= crement;
+            
             if (rotation <= -1f || rotation >= 0.99f)
             {
                 crement *= -1;
                 direction = !direction;
+                n++;
             }
+
             int y;
             if (direction) //horizontal
                 y = 2;
             else
                 y = 0;
+            if (n % 3 == 0)
+            {
+                
+                crement2 = -crement;
+                Console.WriteLine(crement2);
+            }
+            else
+            {
+                crement2 = crement;
+                Console.WriteLine(crement2);
+            }
             for (int x = y; x < 24; x += 3)
             {
                 float orig = cube[x];
-                cube[x] -= crement;
+
+
+                cube[x] += crement2;
+
             }
             //Console.WriteLine(rotation);
             //negative positive positive negative dapat
