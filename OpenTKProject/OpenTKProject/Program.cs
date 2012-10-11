@@ -16,7 +16,7 @@ namespace CS177Project
     class Game : GameWindow
     {
         private Matrix4 cameraMatrix;
-        private float speed, mouseX, forwardZ, sideX, rotation, crement, crement2, crement3, look, jump, up, gravity;
+        private float speed, mouseX, forwardZ, sideX, rotation, crement, crement2, crement3, look, jump, up, gravity, rot;
         private bool zoomed, direction;
         private int n, awesomesauce;
         #region Cubes
@@ -295,7 +295,15 @@ namespace CS177Project
             if (jump <= 0f || jump >= 0.99f)
             {
                 crement3 *= -1;
-            }	
+            }
+            if (rot < 360f)
+            {
+                rot++;
+            }
+            else
+            {
+                rot = 0;
+            }
             #endregion
             //Console.WriteLine(rotation);
             //negative positive positive negative dapat
@@ -337,6 +345,7 @@ namespace CS177Project
 
         void generateCube()
         {
+            //GL.Rotate(rot, 0, 1, 0);
             GL.VertexPointer(3, VertexPointerType.Float, 0, cube);
             GL.ColorPointer(4, ColorPointerType.Float, 0, cubeColors);
             GL.DrawElements(BeginMode.Triangles, 36, DrawElementsType.UnsignedByte, cubeTriangles);
@@ -344,6 +353,7 @@ namespace CS177Project
 
         void generatePyramid()
         {
+            //GL.Rotate(rot, 0, 1, 0);
             GL.Begin(BeginMode.TriangleFan);
             GL.Color3(Color.Red);
             GL.Vertex3(0, 1f, 0); //0 //I want to make it point to where the camera is
@@ -361,6 +371,7 @@ namespace CS177Project
 
         void generateDiamond()
         {
+            GL.Rotate(rot, 1, 0, 0);
             GL.Begin(BeginMode.TriangleFan);
             GL.Color3(Color.Red);
             GL.Vertex3(0, 1f+jump, 0);
